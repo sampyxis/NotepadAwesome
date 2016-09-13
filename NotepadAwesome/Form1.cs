@@ -143,11 +143,36 @@ namespace NotepadAwesome
                         oMailItem.Display(true);
                         commandText.Text = "";
                         break;
+                    case "of": // Open a file
+                        // Open a new window with
+                        if(retArg.Length > 1)
+                        {
+                            try { 
+                                string file = File.ReadAllText(retArg[1] + ".txt");
+                                if (file.Length > 1)
+                                {
+                                    Form1 form = new Form1();
+                                    form.mainNotes.Text = file;
+                                    form.Show();
+                                    commandText.Text = "";
+                                }
+                            } catch
+                                {
+                                    commandText.Text = commandText.Text + ' ' + "wrong file name.";
+                                }
+                        }
+                        break;
+                        
                 }
 
             }
         }
 
+        private void openTextFile(string fileName)
+        {
+            string file = File.ReadAllText(fileName);
+            mainNotes.Text = fileName;
+        }
         private void getTitle()
         {
             // On new - title = Day+General Time (afternoon)+yaer+_+tiimestamp
