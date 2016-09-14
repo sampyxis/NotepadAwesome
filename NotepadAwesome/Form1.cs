@@ -7,7 +7,6 @@ using Microsoft.Office.Interop;
 
 namespace NotepadAwesome
 {
-
     public partial class Form1 : Form
     {
         // Parser
@@ -15,19 +14,19 @@ namespace NotepadAwesome
         static extern IntPtr CommandLineToArgvW(
             [MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
 
-
         public string userDir = "";
         public string appName = System.Windows.Forms.Application.ProductName;
         public string cmdParse = "*";
         public string title = "";
         public string filename = "";
         public bool txtChanged = false;
-
+        public string[] cmdLineSaves;
+        int numSaves = 0;
 
         public Form1()
         {
-
             InitializeComponent();
+            //cmdLineSaves = new string[] { };
             Program.numForms =+ 1;
             // Get user directory - set directory
             // Right now - manually created directory
@@ -36,14 +35,12 @@ namespace NotepadAwesome
 
             // Set the title
             getTitle();
-
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {   
             mainNotes.Text = userDir;
         }
-
 
         private void autoSave()
         {
@@ -65,6 +62,9 @@ namespace NotepadAwesome
                 cmdText = commandText.Text;
                 //var args = new string[2];
                 var retArg = CommandLineToArgs(cmdText);
+                // Save the commands
+                //cmdLineSaves[numSaves] = cmdText;
+                //numSaves++;
 
                 // Need a robust parser - but now just take it all
                 switch (retArg[0].ToLower())
@@ -113,8 +113,14 @@ namespace NotepadAwesome
                         }
                         break;
                     case "d": // Delete file
+                        try
+                        {
+                            File.Delete(userDir + "\\" + retArg[1] + ".txt");
+                        } catch
+                        {
+                            commandText.Text = commandText.Text + " " + "file doesn't exist";
+                        }
                         commandText.Text = "";
-                        File.Delete(userDir + "\\" + retArg[1] + ".txt");
                         break;
                     case "cls": // Clear main screen
                         mainNotes.Text = "";
@@ -153,6 +159,7 @@ namespace NotepadAwesome
                                 {
                                     Form1 form = new Form1();
                                     form.mainNotes.Text = file;
+                                    form.setTitle(retArg[1]);
                                     form.Show();
                                     commandText.Text = "";
                                 }
@@ -162,9 +169,22 @@ namespace NotepadAwesome
                                 }
                         }
                         break;
-                        
+                    case "h": // open the help file to a new window - need to ensure it exists
+                        try
+                        {
+                            string file = File.ReadAllText("helpfile.txt");
+                            Form1 form = new Form1();
+                            form.mainNotes.Text = file;
+                            form.setTitle("helpfile");
+                            form.Show();
+                        } catch
+                        {
+                            commandText.Text = commandText.Text + " " + "Help file doesn't exist";
+                        }
+                        break;
+                    case "cs":// Command line saves
+                        break;
                 }
-
             }
         }
 
@@ -173,17 +193,17 @@ namespace NotepadAwesome
             string file = File.ReadAllText(fileName);
             mainNotes.Text = fileName;
         }
+
         private void getTitle()
         {
             // On new - title = Day+General Time (afternoon)+yaer+_+tiimestamp
             string day = DateTime.Now.DayOfWeek.ToString();
-            string month = String.Format("{0:MMMM}", DateTime.Now);// DateTime. Month.ToString("MMM", CultureInfo.InvariantCulture);
+            string month = String.Format("{0:MMMM}", DateTime.Now);
             string appxTime = DateTime.Now.Hour.ToString();
             string hour = DateTime.Now.Hour.ToString();
             string minute = DateTime.Now.Minute.ToString();
             string sec = DateTime.Now.Second.ToString();
             
-
             // Get general time
             int hourInt = DateTime.Now.Hour;
             if((hourInt > 6) && (hourInt <  11))
@@ -228,7 +248,7 @@ namespace NotepadAwesome
             // If the text has been changed AND it has been x minutes since last save, save the document
             txtChanged = true;
         }
-
+        
         private void Form1_Load_1(object sender, EventArgs e)
         {
             //mainNotes.Text = userDir;
