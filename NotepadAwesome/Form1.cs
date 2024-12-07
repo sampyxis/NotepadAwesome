@@ -314,5 +314,10 @@ namespace NotepadAwesome
                 commandText.Focus();
             }
         }
+
+        private void saveToolStripButton_Click(object sender, EventArgs e)
+        {
+            saveFile();
+        }
     }
 }
