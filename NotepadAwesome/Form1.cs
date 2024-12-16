@@ -194,6 +194,11 @@ namespace NotepadAwesome
             mainNotes.Text = fileName;
         }
 
+        private void openFile()
+        {
+
+        }
+
         private void getTitle()
         {
             // On new - title = Day+General Time (afternoon)+yaer+_+tiimestamp
@@ -312,6 +317,16 @@ namespace NotepadAwesome
             // Check if the tab/ctrl is pressed - if so, move to commandText
             if (e.KeyData == Keys.F1){
                 commandText.Focus();
+            }
+            switch(e.KeyData)
+            {
+                case  Keys.F1:
+                    commandText.Focus();
+                    break;
+                case Keys.ControlKey & Keys.S:
+                    saveFile();
+                    break;
+
             }
         }
 
